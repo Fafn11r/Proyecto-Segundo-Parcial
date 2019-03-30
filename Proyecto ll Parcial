@@ -1,0 +1,142 @@
+public class Heap {
+    private int[] pila = new int[0];
+
+    public Heap() {
+    }
+
+    public void add(int valor) {
+        int[] nuevo;
+        if (this.pila.length == 0) {
+            nuevo = new int[this.pila.length + 1];
+            nuevo[0] = valor;
+            this.pila = nuevo;
+        } else {
+            nuevo = new int[this.pila.length + 1];
+
+            for(int i = 0; i < this.pila.length; ++i) {
+                nuevo[i] = this.pila[i];
+            }
+
+            nuevo[nuevo.length - 1] = valor;
+            this.pila = nuevo;
+            this.flotar(this.pila.length - 1);
+        }
+
+    }
+
+    public int pop() {
+        int retval;
+        if (this.pila.length == 1) {
+            retval = this.pila[0];
+            this.pila = new int[0];
+            return retval;
+        } else {
+            retval = this.pila[0];
+            int[] nuevo = new int[this.pila.length - 1];
+            nuevo[0] = this.pila[this.pila.length - 1];
+
+            for(int i = 1; i < this.pila.length - 1; ++i) {
+                nuevo[i] = nuevo[i];
+            }
+
+            this.pila = nuevo;
+            this.hundir(0);
+            return retval;
+        }
+    }
+
+    public int hijoI(int actual) {
+        return actual * 2;
+    }
+
+    public int hijoD(int actual) {
+        return actual * 2 + 1;
+    }
+
+    public int padre(int actual) {
+        return actual / 2;
+    }
+
+    public void swap(int actual, int nuevo) {
+        int temp = this.pila[actual];
+        this.pila[actual] = this.pila[nuevo];
+        this.pila[nuevo] = temp;
+    }
+
+    public boolean esHoja(int actual) {
+        return actual >= this.pila.length / 2 && actual < this.pila.length;
+    }
+
+    public void hundir(int actual) {
+        if (!this.esHoja(actual) && (this.pila[actual] > this.hijoI(actual) || this.pila[actual] > this.hijoD(actual))) {
+            if (this.hijoI(actual) < this.hijoD(actual)) {
+                this.swap(actual, this.hijoI(actual));
+                this.hundir(this.hijoI(actual));
+            } else {
+                this.swap(actual, this.hijoD(actual));
+                this.hundir(this.hijoD(actual));
+            }
+        }
+
+    }
+
+    public void flotar(int actual) {
+        if (this.pila[actual] < this.pila[this.padre(actual)]) {
+            this.swap(actual, this.padre(actual));
+            this.flotar(this.padre(actual));
+        }
+
+    }
+}
+
+public class Run {
+	
+	public static void main(String[] args) {
+		int[] arr1 = new int[10];
+		int[] arr2 = new int[10];
+		for(int i = 0; i < arr1.length; i++) {
+			arr1[i] = (int) (Math.random() * 100);
+			arr2[i] = (int) (Math.random() * 100);
+		}
+		int[] heap = heapSort(arr1, arr2);
+		int[] merge = mergeSort(arr1, arr2);
+		System.out.print("HeapSort: ");
+		for(int i = 0; i < heap.length; i++) {
+			System.out.print(heap[i] + ", ");
+		}
+		System.out.print("\nMergeSort: ");
+		for(int i = 0; i < merge.length; i++) {
+			System.out.print(merge[i] + ", ");
+		}
+	}
+	
+	public static int[] heapSort(int[] arr1, int[] arr2) {
+		Heap pila = new Heap();
+		int[] retval = new int[arr1.length + arr2.length];
+		for(int i = 0; i < arr1.length; i++) {
+			pila.add(arr1[i]);
+			pila.add(arr2[i]);
+		}
+		for(int i = 0; i < retval.length; i++) {
+			retval[i] = pila.pop();
+		}
+		return retval;
+	}
+	
+	public static int[] mergeSort(int[] arr1, int[] arr2) {
+		int[] retval = new int[arr1.length + arr2.length];
+		for(int i = 0, j = 0, k = 0; i < retval.length; i++) {
+			if(j == arr1.length) {
+				retval[i] = arr2[k++];
+			}else if(k == arr2.length) {
+				retval[i] = arr1[j++];
+			}else if(arr1[j] < arr2[k]) {
+				retval[i] = arr1[j++];
+			}else {
+				retval[i] = arr2[k++];
+			}
+		}
+		return retval;
+	}
+
+}
